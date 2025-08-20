@@ -1,37 +1,35 @@
-class AliveList(list):
-    def __str__(self) -> list:
-
-        list_of_animal = []
-        for animal in self:
-            list_of_animal.append(
-                f"{{Name: {animal.name}, "
-                f" Health: {animal.health}, "
-                f" Hidden: {animal.hidden}}}"
-            )
-        return "[" + ", ".join(list_of_animal) + "]"
+from typing import List, Union
 
 
 class Animal:
-    alive = AliveList()
+    alive: List["Animal"] = []
 
-    def __init__(self, name: str, health: int = 100) -> None:
-        # Не потрібно перезаписувати Animal.alive у конструкторі
-        Animal.alive = AliveList(Animal.alive)
-        self.name = name
-        self.health = health
-        self.hidden = False
+    def __init__(self, name: str) -> None:
+        self.name: str = name
+        self.health: int = 100
+        self.hidden: bool = False
         Animal.alive.append(self)
+
+    def __repr__(self) -> str:
+        return (
+            f"{{Name: {self.name}, Health: {self.health}, "
+            f"Hidden: {self.hidden}}}"
+        )
+
+    def death(self) -> None:
+        if self.health <= 0 and self in Animal.alive:
+            Animal.alive.remove(self)
 
 
 class Herbivore(Animal):
-    def hide(self) -> bool:
+    def hide(self) -> None:
         self.hidden = not self.hidden
-        return self.hidden
 
 
 class Carnivore(Animal):
-    def bite(self, other: Herbivore) -> None:
+    def bite(self, other: Union["Herbivore", "Carnivore"]) -> None:
         if isinstance(other, Herbivore) and not other.hidden:
             other.health -= 50
-            if other.health <= 0:
-                Animal.alive.remove(other)
+            if other.health < 0:
+                other.health = 0
+            other._check_death()
