@@ -4,10 +4,10 @@ from typing import List, Union
 class Animal:
     alive: List["Animal"] = []
 
-    def __init__(self, name: str) -> None:
-        self.name: str = name
-        self.health: int = 100
-        self.hidden: bool = False
+    def __init__(self, name: str, health: int = 100) -> None:
+        self.name = name
+        self.health = health
+        self.hidden = False
         Animal.alive.append(self)
 
     def __repr__(self) -> str:
@@ -16,7 +16,7 @@ class Animal:
             f"Hidden: {self.hidden}}}"
         )
 
-    def death(self) -> None:
+    def _check_death(self) -> None:
         if self.health <= 0 and self in Animal.alive:
             Animal.alive.remove(self)
 
